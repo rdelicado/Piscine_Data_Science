@@ -13,8 +13,8 @@ services:
             - "5432:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
-            - ../customer:/tmp/data/customer
-            - ../item:/tmp/data/item
+            - ~/rdelicad/customer:/tmp/data/customer
+            - ~/rdelicad/item:/tmp/data/item
         networks:
             - net_postgres
 
