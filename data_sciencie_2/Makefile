@@ -50,6 +50,9 @@ clean: down
 	@echo "$(YELLOW)Eliminando volúmenes y redes...$(RESET)"
 	@docker volume rm -f postgres_data 2>/dev/null || true
 	@docker network rm -f postnet 2>/dev/null || true
+	@rm -r ex01/pie.png 
+	@rm -r ex02/chart.png
+	@rm -r ex03/plot.png
 	@echo "$(GREEN)Limpieza completada.$(RESET)"
 
 fclean: clean
