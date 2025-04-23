@@ -1,24 +1,12 @@
 #!/bin/bash
 
-set -e # Exit immediately if a command exits with a non-zero status
-
-#files=/sgoinfre/students/$USER/customer/*.csv
-files_customer=(../customer/*.csv)
-if [ ! -e "${files_customer[0]}" ]; then
-    echo "No CSV files found in customer directory."
-    exit 1
-fi
-files_item=(../item/*.csv)
-if [ ! -e "${files_item[0]}" ]; then
-    echo "No CSV files found in item directory."
-    exit 1
-fi
+set -e
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${YELLOW}Step 0: Creating and importing customers table...${NC}"
+echo -e "${YELexitLOW}Step 1: Creating and importing customers table...${NC}"
 
 docker exec database psql -U rdelicad -d piscineds -c "
 DROP TABLE IF EXISTS customers;
@@ -31,9 +19,7 @@ CREATE TABLE customers (
     user_session UUID
 );"
 
-echo -e "${YELLOW}Step 1: Importing CSV files...${NC}"
-
-for csv_file in "${files_customer[@]}"; do
+for csv_file in /sgoinfre/students/$USER/customer/*.csv; do
     echo -e "${GREEN}Importing CSV file: ${csv_file}...${NC}"
     docker exec -i database psql -U rdelicad -d piscineds -c "\copy customers FROM STDIN DELIMITER ',' CSV HEADER;" < "$csv_file"
 done
@@ -87,7 +73,7 @@ CREATE TABLE temp_items (
 );
 "
 
-docker exec -i database psql -U rdelicad -d piscineds -c "\COPY temp_items FROM STDIN DELIMITER ',' CSV HEADER;" < "${files_item[0]}"
+docker exec -i database psql -U rdelicad -d piscineds -c "\COPY temp_items FROM STDIN DELIMITER ',' CSV HEADER;" < /sgoinfre/students/$USER/item/item.csv
 
 docker exec database psql -U rdelicad -d piscineds -c "
 UPDATE customers c
