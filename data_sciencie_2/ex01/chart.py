@@ -17,11 +17,13 @@ def plot_daily_purchase(conexion):
             month_starts.append(min(dates))
 
     plt.figure()
+    plt.grid()
     plt.plot(daily_purchase.index, daily_purchase.values)
     plt.xticks(month_starts, months)
     plt.ylabel('Number of customers')
+    plt.xlim(left=daily_purchase.index[0]) 
     plt.tight_layout()
-    plt.savefig('daily_purchase.png', dpi=300)
+    plt.savefig('line_chart.png', dpi=300)
     plt.show()
 
 def plot_altarian_sales(conexion):
@@ -42,12 +44,13 @@ def plot_altarian_sales(conexion):
                 break
 
     plt.figure()
+    plt.grid()
     plt.bar(month_labels, sales_per_month.values)
     plt.xlabel('Month')
     plt.ylabel('Total sales in million of ₳')
     plt.ylim(0.0, 1.8)
     plt.tight_layout()
-    plt.savefig('ventas_altarian.png')
+    plt.savefig('bar_chart.png')
     plt.show()
 
 def plot_total_sales(conexion):
@@ -55,26 +58,29 @@ def plot_total_sales(conexion):
     df = pd.read_sql_query(query, conexion)
     df['event_time'] = pd.to_datetime(df['event_time'])
     df['month'] = df['event_time'].dt.to_period('M')
-    
+
     # Total ventas por mes
     total_sales = df.groupby('month')['price'].sum()
     # Clientes únicos por mes
     unique_customers = df.groupby('month')['user_id'].nunique()
     # Gasto medio por cliente por mes
     avg_spend = total_sales / unique_customers
+    avg_spend = avg_spend.dropna()  # Elimina meses sin datos
 
     month_labels = [d.strftime('%b') for d in avg_spend.index.to_timestamp()]
 
     plt.figure()
-    plt.fill_between(month_labels, avg_spend.values, color='skyblue', alpha=0.5)
+    plt.grid()
+    # Sombrea desde 0 hasta avg_spend.values
+    plt.fill_between(month_labels, 0, avg_spend.values, color='skyblue', alpha=0.7)
     plt.plot(month_labels, avg_spend.values, marker='o', color='blue')
     plt.xlabel('Month')
     plt.ylabel('average spend/customers in ₳')
     plt.ylim(0, 60)
     plt.yticks(range(0, 65, 5))
     plt.tight_layout()
-    plt.savefig('average_spend_per_customer.png')
-    plt.show()
+    plt.savefig('area_chart.png')
+    plt.close()
 
 if __name__ == "__main__":
     conexion = psycopg2.connect(
